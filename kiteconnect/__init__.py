@@ -631,14 +631,20 @@ class KiteConnect(object):
 				params=params))
 
 		try:
+			headers = {
+				'User-Agent':
+					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
+			}
+
 			r = self.reqsession.request(method,
 					url,
 					data=params if method in ["POST", "PUT"] else None,
 					params=params if method in ["GET", "DELETE"] else None,
-					verify=False,
-					allow_redirects=True,
+					# verify=False,
+					# allow_redirects=True,
 					timeout=self._timeout,
-					proxies=self.proxies)
+					# proxies=self.proxies,
+					headers=headers)
 		except requests.ConnectionError:
 			raise ex.ClientNetworkException("Gateway connection error", code=503)
 		except requests.Timeout:
