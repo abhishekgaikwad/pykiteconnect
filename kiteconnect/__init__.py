@@ -206,6 +206,7 @@ class KiteConnect(object):
 		"""
 		self.api_key = api_key
 		self.access_token = access_token
+		self.public_token = None
 		self.debug = debug
 		self.micro_cache = micro_cache
 		self.session_hook = None
@@ -244,6 +245,10 @@ class KiteConnect(object):
 	def set_access_token(self, access_token):
 		"""Set the `access_token` received after a successful authentication."""
 		self.access_token = access_token
+
+	def set_public_token(self, public_token):
+		"""Set the `set_request_token` received after a successful authentication."""
+		self.public_token = public_token
 
 	def login_url(self):
 		"""
@@ -601,6 +606,10 @@ class KiteConnect(object):
 		# Is there a token?.
 		if self.access_token:
 			params["access_token"] = self.access_token
+
+		# Is there a token?.
+		if self.public_token:
+			params["public_token"] = self.public_token
 
 		# override instance's API key if one is supplied in the params
 		if "api_key" not in params or not params.get("api_key"):
