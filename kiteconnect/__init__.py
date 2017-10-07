@@ -133,6 +133,7 @@ class KiteConnect(object):
 	# Default root API endpoint. It's possible to
 	# override this by passing the `root` parameter during initialisation.
 	_root = "https://api.kite.trade"
+	_root_historical = "https://kitecharts.zerodha.com"
 	_login = "https://kite.trade/connect/login"
 
 	# URIs to various calls
@@ -174,6 +175,7 @@ class KiteConnect(object):
 		"market.instruments": "/instruments/{exchange}",
 		"market.quote": "/instruments/{exchange}/{tradingsymbol}",
 		"market.historical": "/instruments/historical/{instrument_token}/{interval}",
+		"market.historical2": "/api/chart/{instrument_token}/{interval}",
 		"market.trigger_range": "/instruments/{exchange}/{tradingsymbol}/trigger_range"
 	}
 
@@ -519,12 +521,14 @@ class KiteConnect(object):
 		- `interval` is the candle interval (minute, day, 5 minute etc.)
 		- `continuous` is a boolean flag to get continous data for futures and options instruments.
 		"""
-		data = self._get("market.historical", {
+		data = self._get("market.historical2", {
 			"instrument_token": instrument_token,
 			"from": from_date,
 			"to": to_date,
 			"interval": interval,
-			"continuous": 1 if continuous else 0})
+			"continuous": 1 if continuous else 0,
+			"historical": True
+		})
 
 		records = []
 		for d in data["candles"]:
@@ -615,6 +619,7 @@ class KiteConnect(object):
 		if "api_key" not in params or not params.get("api_key"):
 			params["api_key"] = self.api_key
 
+
 		uri = self._routes[route]
 
 		# 'RESTful' URLs.
@@ -622,7 +627,10 @@ class KiteConnect(object):
 			for k in params:
 				uri = uri.replace("{" + k + "}", str(params[k]))
 
-		url = self._root + uri
+		if 'historical' in params and params['historical'] == True:
+			url = self._root_historical + uri
+		else:
+			url = self._root + uri
 
 		if self.debug:
 			logger.debug(" Request: {method} {url} {params}".format(
